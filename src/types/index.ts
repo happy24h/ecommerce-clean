@@ -91,38 +91,50 @@ export interface Cart {
 }
 
 // ==================== ORDER ====================
-export type OrderStatus =
-  | 'pending'
-  | 'confirmed'
-  | 'shipping'
-  | 'delivered'
-  | 'cancelled'
+export type OrderStatus = 'PENDING' | 'PAID' | 'SHIPPING' | 'DELIVERED' | 'CANCELLED'
+export type PaymentMethod = 'PAYOS' | 'MOMO' | 'BANK_TRANSFER' | 'COD'
+
+export interface ShippingAddress {
+  name: string
+  phone: string
+  address: string
+}
 
 export interface OrderItem {
-  productId: number
-  product: Product
-  quantity: number
+  productId: string
+  title: string
   price: number
+  quantity: number
 }
 
 export interface Order {
-  id: string
+  _id: string
+  userId: string
   items: OrderItem[]
-  shippingAddress: Address
-  status: OrderStatus
-  paymentMethod: 'cod' | 'banking' | 'momo' | 'zalopay'
-  subtotal: number
+  totalAmount: number
   shippingFee: number
-  discount: number
-  total: number
+  shippingAddress: ShippingAddress
+  status: OrderStatus
+  paymentMethod: PaymentMethod
   note?: string
   createdAt: string
   updatedAt: string
 }
 
 export interface CreateOrderPayload {
-  paymentMethod: Order['paymentMethod']
+  paymentMethod: PaymentMethod
+  shippingAddress: ShippingAddress
+  shippingFee: number
   note?: string
+}
+
+// ==================== PAYMENT ====================
+export interface PaymentLink {
+  checkoutUrl: string
+  qrCode: string
+  paymentLinkId: string
+  status: string
+  amount: number
 }
 
 // ==================== REVIEW ====================

@@ -39,6 +39,8 @@ export const ROUTES = {
   CART: '/cart',
   CHECKOUT: '/checkout',
   ORDER_SUCCESS: '/order/success/:orderId',
+  PAYMENT_SUCCESS: '/payment/success',
+  PAYMENT_CANCEL: '/payment/cancel',
   ORDERS: '/account/orders',
   ORDER_DETAIL: '/account/orders/:id',
   PROFILE: '/account/profile',
@@ -48,18 +50,18 @@ export const ROUTES = {
 } as const
 
 export const ORDER_STATUS_LABEL: Record<string, string> = {
-  pending: 'Chờ xác nhận',
-  confirmed: 'Đã xác nhận',
-  shipping: 'Đang giao',
-  delivered: 'Đã giao',
-  cancelled: 'Đã hủy',
+  PENDING:   'Chờ thanh toán',
+  PAID:      'Đã thanh toán',
+  SHIPPING:  'Đang giao hàng',
+  DELIVERED: 'Đã giao hàng',
+  CANCELLED: 'Đã hủy',
 }
 
 export const PAYMENT_METHOD_LABEL: Record<string, string> = {
-  cod: 'Thanh toán khi nhận hàng',
-  banking: 'Chuyển khoản ngân hàng',
-  momo: 'Ví MoMo',
-  zalopay: 'ZaloPay',
+  PAYOS: 'PayOS (QR Code)',
+  MOMO: 'Ví MoMo',
+  BANK_TRANSFER: 'Chuyển khoản ngân hàng',
+  COD: 'Thanh toán khi nhận hàng',
 }
 
 export const SORT_OPTIONS = [

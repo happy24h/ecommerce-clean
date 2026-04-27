@@ -1,32 +1,75 @@
 import { useState } from 'react'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, QrCode, Wallet, Building2, Truck } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
-import { useCurrentUser } from '@/hooks/useAuth'
 import { useCreateOrder } from '@/hooks/useOrders'
 import { formatPrice } from '@/utils'
 import { Button } from '@/components/ui/Button'
-import { PAYMENT_METHOD_LABEL } from '@/constants'
-import type { Order } from '@/types'
+import type { PaymentMethod } from '@/types'
+
+const PAYMENT_OPTIONS: {
+  method: PaymentMethod
+  label: string
+  desc: string
+  icon: React.ReactNode
+}[] = [
+  {
+    method: 'PAYOS',
+    label: 'PayOS',
+    desc: 'Thanh toán QR Code — nhanh & an toàn',
+    icon: <QrCode className="h-5 w-5 text-blue-500" />,
+  },
+  {
+    method: 'MOMO',
+    label: 'Ví MoMo',
+    desc: 'Thanh toán qua ví MoMo',
+    icon: <Wallet className="h-5 w-5 text-pink-500" />,
+  },
+  {
+    method: 'BANK_TRANSFER',
+    label: 'Chuyển khoản ngân hàng',
+    desc: 'Chuyển khoản trực tiếp qua Internet Banking',
+    icon: <Building2 className="h-5 w-5 text-green-600" />,
+  },
+  {
+    method: 'COD',
+    label: 'Thanh toán khi nhận hàng',
+    desc: 'Trả tiền mặt khi nhận được hàng',
+    icon: <Truck className="h-5 w-5 text-orange-500" />,
+  },
+]
 
 export const CheckoutPage = () => {
   const { items, totalPrice } = useCartStore()
-  const { data: user } = useCurrentUser()
   const { mutate: createOrder, isPending } = useCreateOrder()
 
-  const defaultAddress = user?.addresses.find((a) => a.isDefault) ?? user?.addresses[0]
-
-  const [selectedAddressId, setSelectedAddressId] = useState<string | undefined>(
-    defaultAddress?._id
-  )
-  const [paymentMethod, setPaymentMethod] = useState<Order['paymentMethod']>('cod')
+  const [shippingAddress, setShippingAddress] = useState({
+    name: '',
+    phone: '',
+    address: '',
+  })
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('PAYOS')
   const [note, setNote] = useState('')
 
   const subtotal = totalPrice()
   const shippingFee = subtotal >= 300000 ? 0 : 30000
   const total = subtotal + shippingFee
 
+  const isAddressValid =
+    shippingAddress.name.trim() &&
+    shippingAddress.phone.trim() &&
+    shippingAddress.address.trim()
+
+  const handleChange = (field: keyof typeof shippingAddress) => (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => setShippingAddress((prev) => ({ ...prev, [field]: e.target.value }))
+
   const handleSubmit = () => {
-    createOrder({ paymentMethod, note: note || undefined })
+    createOrder({
+      paymentMethod,
+      shippingAddress,
+      shippingFee,
+      note: note || undefined,
+    })
   }
 
   return (
@@ -34,59 +77,59 @@ export const CheckoutPage = () => {
       <h1 className="mb-6 text-xl font-bold text-gray-800">Thanh toán</h1>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-        {/* Left: address + payment */}
+        {/* Left */}
         <div className="space-y-5 lg:col-span-3">
-          {/* Delivery address */}
+          {/* Shipping address */}
           <section className="rounded-xl border border-gray-100 bg-white p-5">
-            <h2 className="mb-3 flex items-center justify-between text-base font-semibold text-gray-800">
-              Địa chỉ giao hàng
-              <button className="text-xs text-primary-600 hover:underline">+ Thêm địa chỉ</button>
-            </h2>
-            {user?.addresses.length ? (
-              <div className="space-y-2">
-                {user.addresses.map((addr) => (
-                  <label
-                    key={addr._id}
-                    className={`flex cursor-pointer items-start gap-3 rounded-lg border-2 p-3 transition-colors ${
-                      selectedAddressId === addr._id
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-gray-100 hover:border-gray-200'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="address"
-                      value={addr._id}
-                      checked={selectedAddressId === addr._id}
-                      onChange={() => setSelectedAddressId(addr._id)}
-                      className="mt-0.5 accent-primary-600"
-                    />
-                    <div className="text-sm">
-                      <p className="font-medium text-gray-800">
-                        {addr.fullName} · {addr.phone}
-                        {addr.isDefault && (
-                          <span className="ml-1 rounded-sm bg-primary-100 px-1 py-0.5 text-xs text-primary-700">
-                            Mặc định
-                          </span>
-                        )}
-                      </p>
-                      <p className="text-gray-500">
-                        {addr.street}, {addr.ward}, {addr.district}, {addr.province}
-                      </p>
-                    </div>
-                  </label>
-                ))}
+            <h2 className="mb-4 text-base font-semibold text-gray-800">Địa chỉ giao hàng</h2>
+            <div className="space-y-3">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-gray-600">
+                  Họ tên người nhận <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={shippingAddress.name}
+                  onChange={handleChange('name')}
+                  placeholder="Nguyễn Văn A"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm
+                    placeholder:text-gray-400 focus:border-primary-500 focus:outline-none"
+                />
               </div>
-            ) : (
-              <p className="text-sm text-gray-400">Chưa có địa chỉ. Vui lòng thêm địa chỉ giao hàng.</p>
-            )}
+              <div>
+                <label className="mb-1 block text-xs font-medium text-gray-600">
+                  Số điện thoại <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  value={shippingAddress.phone}
+                  onChange={handleChange('phone')}
+                  placeholder="0901 234 567"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm
+                    placeholder:text-gray-400 focus:border-primary-500 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-gray-600">
+                  Địa chỉ giao hàng <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={shippingAddress.address}
+                  onChange={handleChange('address')}
+                  placeholder="123 Trần Thái Tông, Cầu Giấy, Hà Nội"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm
+                    placeholder:text-gray-400 focus:border-primary-500 focus:outline-none"
+                />
+              </div>
+            </div>
           </section>
 
           {/* Payment method */}
           <section className="rounded-xl border border-gray-100 bg-white p-5">
             <h2 className="mb-3 text-base font-semibold text-gray-800">Phương thức thanh toán</h2>
             <div className="space-y-2">
-              {(Object.keys(PAYMENT_METHOD_LABEL) as Order['paymentMethod'][]).map((method) => (
+              {PAYMENT_OPTIONS.map(({ method, label, desc, icon }) => (
                 <label
                   key={method}
                   className={`flex cursor-pointer items-center gap-3 rounded-lg border-2 p-3 transition-colors ${
@@ -103,7 +146,15 @@ export const CheckoutPage = () => {
                     onChange={() => setPaymentMethod(method)}
                     className="accent-primary-600"
                   />
-                  <span className="text-sm text-gray-700">{PAYMENT_METHOD_LABEL[method]}</span>
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-gray-50">
+                      {icon}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">{label}</p>
+                      <p className="text-xs text-gray-400">{desc}</p>
+                    </div>
+                  </div>
                 </label>
               ))}
             </div>
@@ -170,12 +221,16 @@ export const CheckoutPage = () => {
             fullWidth
             size="lg"
             loading={isPending}
-            disabled={items.length === 0}
+            disabled={items.length === 0 || !isAddressValid}
             onClick={handleSubmit}
             rightIcon={<ChevronRight className="h-4 w-4" />}
           >
-            Xác nhận đặt hàng
+            {paymentMethod === 'PAYOS' ? 'Thanh toán ngay' : 'Xác nhận đặt hàng'}
           </Button>
+
+          {!isAddressValid && (
+            <p className="text-center text-xs text-red-400">Vui lòng điền đầy đủ địa chỉ giao hàng</p>
+          )}
 
           <p className="text-center text-xs text-gray-400">
             Bằng cách đặt hàng, bạn đồng ý với{' '}

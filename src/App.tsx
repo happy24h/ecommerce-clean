@@ -12,10 +12,12 @@ import { CartPage }         from '@/pages/CartPage'
 import { CheckoutPage }     from '@/pages/CheckoutPage'
 import { LoginPage }        from '@/pages/LoginPage'
 import { RegisterPage }     from '@/pages/RegisterPage'
-import { OrdersPage }       from '@/pages/OrdersPage'
-import { NewsPage }         from '@/pages/NewsPage'
-import { ContactPage }      from '@/pages/ContactPage'
-import { WishlistPage }     from '@/pages/WishlistPage'
+import { OrdersPage }          from '@/pages/OrdersPage'
+import { NewsPage }            from '@/pages/NewsPage'
+import { ContactPage }         from '@/pages/ContactPage'
+import { WishlistPage }        from '@/pages/WishlistPage'
+import { PaymentSuccessPage }  from '@/pages/PaymentSuccessPage'
+import { PaymentCancelPage }   from '@/pages/PaymentCancelPage'
 
 // ✅ QueryClient config — tối ưu cho E-commerce
 const queryClient = new QueryClient({
@@ -64,7 +66,11 @@ function App() {
               <Route path="/account/profile"    element={<div className="p-8 text-center text-gray-500">Profile Page</div>} />
             </Route>
 
-            {/* Order success */}
+            {/* Payment result pages (PayOS return/cancel URLs) */}
+            <Route path="/payment/success" element={<PaymentSuccessPage />} />
+            <Route path="/payment/cancel"  element={<PaymentCancelPage />} />
+
+            {/* Order success (non-PAYOS) */}
             <Route
               path="/order/success/:orderId"
               element={

@@ -1,30 +1,31 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Package, ChevronRight } from 'lucide-react'
+import { Package, ShoppingBag, ChevronRight } from 'lucide-react'
 import { useMyOrders } from '@/hooks/useOrders'
 import { formatPrice, formatDate } from '@/utils'
 import { ORDER_STATUS_LABEL } from '@/constants'
 import { Spinner, EmptyState, Badge } from '@/components/ui'
 import type { OrderStatus } from '@/types'
 
-const STATUS_TABS = [
-  { label: 'Tất cả',         value: undefined },
-  { label: 'Chờ xác nhận',   value: 'pending' },
-  { label: 'Đang giao',      value: 'shipping' },
-  { label: 'Đã giao',        value: 'delivered' },
-  { label: 'Đã hủy',         value: 'cancelled' },
-] as const
+const STATUS_TABS: { label: string; value: OrderStatus | undefined }[] = [
+  { label: 'Tất cả',          value: undefined },
+  { label: 'Chờ thanh toán',  value: 'PENDING' },
+  { label: 'Đã thanh toán',   value: 'PAID' },
+  { label: 'Đang giao',       value: 'SHIPPING' },
+  { label: 'Đã giao',         value: 'DELIVERED' },
+  { label: 'Đã hủy',          value: 'CANCELLED' },
+]
 
-const STATUS_BADGE: Record<OrderStatus, 'warning' | 'info' | 'success' | 'danger' | 'default'> = {
-  pending:   'warning',
-  confirmed: 'info',
-  shipping:  'info',
-  delivered: 'success',
-  cancelled: 'danger',
+const STATUS_BADGE: Record<OrderStatus, 'warning' | 'success' | 'info' | 'danger'> = {
+  PENDING:   'warning',
+  PAID:      'success',
+  SHIPPING:  'info',
+  DELIVERED: 'success',
+  CANCELLED: 'danger',
 }
 
 export const OrdersPage = () => {
-  const [activeStatus, setActiveStatus] = useState<string | undefined>(undefined)
+  const [activeStatus, setActiveStatus] = useState<OrderStatus | undefined>(undefined)
   const [page, setPage] = useState(1)
 
   const { data, isLoading } = useMyOrders(page, activeStatus)
@@ -34,7 +35,7 @@ export const OrdersPage = () => {
       <h1 className="mb-6 text-xl font-bold text-gray-800">Đơn hàng của tôi</h1>
 
       {/* Status tabs */}
-      <div className="mb-4 flex overflow-x-auto border-b border-gray-200 gap-0">
+      <div className="mb-4 flex overflow-x-auto border-b border-gray-200">
         {STATUS_TABS.map((tab) => (
           <button
             key={String(tab.value)}
@@ -63,24 +64,20 @@ export const OrdersPage = () => {
         <div className="space-y-3">
           {data.data.map((order) => (
             <Link
-              key={order.id}
-              to={`/account/orders/${order.id}`}
+              key={order._id}
+              to={`/account/orders/${order._id}`}
               className="flex items-center gap-4 rounded-xl border border-gray-100 bg-white
                 p-4 hover:shadow-sm transition-shadow"
             >
-              {/* First product image */}
-              <img
-                src={order.items[0]?.product.images[0]}
-                alt=""
-                className="h-16 w-16 flex-shrink-0 rounded-lg border border-gray-100 object-contain bg-gray-50 p-1"
-              />
+              <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg border border-gray-100 bg-gray-50">
+                <ShoppingBag className="h-7 w-7 text-gray-400" />
+              </div>
 
-              {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-sm font-medium text-gray-800 line-clamp-1">
-                      {order.items[0]?.product.title}
+                      {order.items[0]?.title}
                       {order.items.length > 1 && (
                         <span className="text-gray-400"> +{order.items.length - 1} sản phẩm</span>
                       )}
@@ -92,14 +89,15 @@ export const OrdersPage = () => {
                   </Badge>
                 </div>
                 <div className="mt-2 flex items-center justify-between">
-                  <span className="text-sm font-bold text-primary-600">{formatPrice(order.total)}</span>
+                  <span className="text-sm font-bold text-primary-600">
+                    {formatPrice(order.totalAmount)}
+                  </span>
                   <ChevronRight className="h-4 w-4 text-gray-400" />
                 </div>
               </div>
             </Link>
           ))}
 
-          {/* Pagination */}
           {data.meta.totalPages > 1 && (
             <div className="flex justify-center gap-1 pt-4">
               {Array.from({ length: data.meta.totalPages }).map((_, i) => (
