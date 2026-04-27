@@ -9,6 +9,11 @@ export const QUERY_KEYS = {
   CATEGORIES: 'categories',
   CATEGORY_DETAIL: 'category-detail',
 
+  // Posts
+  POSTS: 'posts',
+  POST_DETAIL: 'post-detail',
+  POST_CATEGORIES: 'post-categories',
+
   // Auth
   CURRENT_USER: 'current-user',
 
@@ -21,6 +26,9 @@ export const QUERY_KEYS = {
 
   // Cart (nếu dùng server-side cart)
   CART: 'cart',
+
+  // Wishlist
+  WISHLIST: 'wishlist',
 } as const
 
 export const ROUTES = {
@@ -63,4 +71,5 @@ export const SORT_OPTIONS = [
 ] as const
 
 export const DEFAULT_PAGE_SIZE = 12
+export const WEBSITE_ID = 'prostore'
 export const MAX_QUANTITY = 99

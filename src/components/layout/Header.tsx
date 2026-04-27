@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import {
   ShoppingCart, Search, User, Menu, X,
   Heart, Package, LogOut, ChevronDown,
@@ -15,9 +15,16 @@ export const Header = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const navigate = useNavigate()
 
+  const { pathname } = useLocation()
   const totalItems = useCartStore((s) => s.totalItems())
   const { isAuthenticated, user } = useIsAuthenticated()
   const { mutate: logout } = useLogout()
+
+  const navLinks = [
+    { to: ROUTES.PRODUCTS, label: 'Sản phẩm' },
+    { to: '/news', label: 'Tin tức' },
+    { to: '/contact', label: 'Liên hệ' },
+  ]
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -57,6 +64,24 @@ export const Header = () => {
 
           {/* Actions */}
           <div className="ml-auto flex items-center gap-1">
+            {/* Nav links — desktop */}
+            <nav className="hidden md:flex items-center gap-1 mr-1">
+              {navLinks.map(({ to, label }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className={cn(
+                    'rounded-md px-3 py-1.5 text-sm font-medium transition-colors whitespace-nowrap',
+                    pathname === to || pathname.startsWith(to + '/')
+                      ? 'bg-primary-50 text-primary-600'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  )}
+                >
+                  {label}
+                </Link>
+              ))}
+            </nav>
+
             {/* Search — mobile */}
             <button
               className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 md:hidden"
@@ -166,6 +191,25 @@ export const Header = () => {
                 </button>
               </div>
             </form>
+            {/* Nav links — mobile */}
+            <div className="mt-3 flex flex-col gap-0.5">
+              {navLinks.map(({ to, label }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  onClick={() => setMenuOpen(false)}
+                  className={cn(
+                    'rounded-lg px-3 py-2 text-sm font-medium',
+                    pathname === to || pathname.startsWith(to + '/')
+                      ? 'bg-primary-50 text-primary-600'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  )}
+                >
+                  {label}
+                </Link>
+              ))}
+            </div>
+
             {!isAuthenticated && (
               <div className={cn('mt-3 flex gap-2')}>
                 <Link to={ROUTES.LOGIN} className="flex-1 rounded-lg border border-primary-600 py-2

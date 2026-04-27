@@ -13,6 +13,9 @@ import { CheckoutPage }     from '@/pages/CheckoutPage'
 import { LoginPage }        from '@/pages/LoginPage'
 import { RegisterPage }     from '@/pages/RegisterPage'
 import { OrdersPage }       from '@/pages/OrdersPage'
+import { NewsPage }         from '@/pages/NewsPage'
+import { ContactPage }      from '@/pages/ContactPage'
+import { WishlistPage }     from '@/pages/WishlistPage'
 
 // ✅ QueryClient config — tối ưu cho E-commerce
 const queryClient = new QueryClient({
@@ -44,6 +47,8 @@ function App() {
             <Route path="/"                   element={<HomePage />} />
             <Route path="/products"           element={<ProductsPage />} />
             <Route path="/products/:id"        element={<ProductDetailPage />} />
+            <Route path="/news"               element={<NewsPage />} />
+            <Route path="/contact"            element={<ContactPage />} />
             <Route path="/category/:slug"     element={<ProductsPage />} />
             <Route path="/search"             element={<ProductsPage />} />
             <Route path="/cart"               element={<CartPage />} />
@@ -53,6 +58,7 @@ function App() {
             {/* Protected routes — yêu cầu đăng nhập */}
             <Route element={<ProtectedRoute />}>
               <Route path="/checkout"           element={<CheckoutPage />} />
+              <Route path="/account/wishlist"   element={<WishlistPage />} />
               <Route path="/account/orders"     element={<OrdersPage />} />
               <Route path="/account/orders/:id" element={<div className="p-8 text-center text-gray-500">Order Detail Page</div>} />
               <Route path="/account/profile"    element={<div className="p-8 text-center text-gray-500">Profile Page</div>} />

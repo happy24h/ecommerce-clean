@@ -6,6 +6,7 @@ import type {
   Review,
   ApiResponse,
 } from '@/types'
+import { WEBSITE_ID } from '@/constants'
 
 export const productApi = {
   // Lấy danh sách sản phẩm (có filter, search, pagination)
@@ -14,7 +15,7 @@ export const productApi = {
   ): Promise<PaginatedResponse<Product>> => {
     // backend dùng current/pageSize thay vì page/limit
     const { page, limit, ...rest } = filter
-    const params = { ...rest, current: page, pageSize: limit }
+    const params = { websiteId: WEBSITE_ID, ...rest, current: page, pageSize: limit }
     const { data } = await axiosInstance.get('/product', { params })
     return {
       data: data.data?.result ?? [],
@@ -29,14 +30,14 @@ export const productApi = {
 
   // Lấy chi tiết sản phẩm theo slug
   getProductBySlug: async (slug: string): Promise<Product> => {
-    const { data } = await axiosInstance.get(`/product/${slug}`)
+    const { data } = await axiosInstance.get(`/product/${slug}`, { params: { websiteId: WEBSITE_ID } })
     return data.data
   },
 
   // Lấy sản phẩm nổi bật (cho trang Home)
   getFeaturedProducts: async (): Promise<Product[]> => {
-    const { data } = await axiosInstance.get('/product')
-    return data.data?.result  
+    const { data } = await axiosInstance.get('/product', { params: { websiteId: WEBSITE_ID } })
+    return data.data?.result
   },
 
   // Lấy sản phẩm liên quan

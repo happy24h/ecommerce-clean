@@ -2,13 +2,15 @@ import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   ShoppingCart, ExternalLink, Download, Play,
-  Minus, Plus, ChevronRight, Tag, Package,
+  Minus, Plus, ChevronRight, Tag, Package, Heart,
 } from 'lucide-react'
 import { useProduct, useRelatedProducts } from '@/hooks/useProducts'
 import { useCartStore } from '@/store/cartStore'
+import { useToggleWishlist } from '@/hooks/useWishlist'
 import { formatPrice } from '@/utils'
 import { Skeleton } from '@/components/ui'
 import { ProductCard } from '@/components/product/ProductCard'
+import parse from "html-react-parser";
 
 export const ProductDetailPage = () => {
   const { id = '' } = useParams()
@@ -21,6 +23,7 @@ export const ProductDetailPage = () => {
     product?._id ?? ''
   )
   const addItem = useCartStore((s) => s.addItem)
+  const { mutate: toggleWishlist, isPending: wishlistPending } = useToggleWishlist()
 
   if (isLoading) return <ProductDetailSkeleton />
 
@@ -147,13 +150,24 @@ export const ProductDetailPage = () => {
           {/* Nút hành động */}
           {isDigital ? (
             <div className="flex flex-col gap-2 pt-1">
-              <button
-                onClick={() => addItem(product, 1)}
-                className="flex items-center justify-center gap-2 rounded-xl bg-primary-600
-                  py-3 text-sm font-semibold text-white hover:bg-primary-700 transition-colors"
-              >
-                <ShoppingCart className="h-4 w-4" /> Mua ngay
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => addItem(product, 1)}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary-600
+                    py-3 text-sm font-semibold text-white hover:bg-primary-700 transition-colors"
+                >
+                  <ShoppingCart className="h-4 w-4" /> Mua ngay
+                </button>
+                <button
+                  onClick={() => toggleWishlist(product._id)}
+                  disabled={wishlistPending}
+                  className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl
+                    border-2 border-gray-200 text-gray-400 hover:border-red-400 hover:text-red-500
+                    disabled:opacity-50 transition-colors"
+                >
+                  <Heart className="h-5 w-5" />
+                </button>
+              </div>
               <div className="flex gap-2">
                 {product.demoUrl && (
                   <a
@@ -182,17 +196,28 @@ export const ProductDetailPage = () => {
               </div>
             </div>
           ) : (
-            <button
-              disabled={outOfStock}
-              onClick={() => addItem(product, quantity)}
-              className="flex items-center justify-center gap-2 rounded-xl border-2 border-primary-600
-                py-3 text-sm font-semibold text-primary-600 hover:bg-primary-50
-                disabled:border-gray-200 disabled:cursor-not-allowed disabled:text-gray-400
-                transition-colors"
-            >
-              <ShoppingCart className="h-4 w-4" />
-              {outOfStock ? 'Hết hàng' : 'Thêm vào giỏ'}
-            </button>
+            <div className="flex gap-2">
+              <button
+                disabled={outOfStock}
+                onClick={() => addItem(product, quantity)}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-primary-600
+                  py-3 text-sm font-semibold text-primary-600 hover:bg-primary-50
+                  disabled:border-gray-200 disabled:cursor-not-allowed disabled:text-gray-400
+                  transition-colors"
+              >
+                <ShoppingCart className="h-4 w-4" />
+                {outOfStock ? 'Hết hàng' : 'Thêm vào giỏ'}
+              </button>
+              <button
+                onClick={() => toggleWishlist(product._id)}
+                disabled={wishlistPending}
+                className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl
+                  border-2 border-gray-200 text-gray-400 hover:border-red-400 hover:text-red-500
+                  disabled:opacity-50 transition-colors"
+              >
+                <Heart className="h-5 w-5" />
+              </button>
+            </div>
           )}
 
           {/* Metadata — physical (nếu có) */}
@@ -229,9 +254,9 @@ export const ProductDetailPage = () => {
       {/* Mô tả */}
       <section className="rounded-xl border border-gray-100 p-6">
         <h2 className="mb-3 text-base font-bold text-gray-800">Mô tả sản phẩm</h2>
-        <p className="text-sm leading-relaxed text-gray-600 whitespace-pre-line">
-          {product.description}
-        </p>
+        <div className="text-sm leading-relaxed text-gray-600 prose prose-sm max-w-none">
+          {parse(product.description)}
+        </div>
       </section>
 
       {/* Sản phẩm liên quan */}

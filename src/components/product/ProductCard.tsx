@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
-import { ShoppingCart } from 'lucide-react'
+import { ShoppingCart, Heart } from 'lucide-react'
 import type { Product } from '@/types'
 import { formatPrice } from '@/utils'
 import { useCartStore } from '@/store/cartStore'
+import { useToggleWishlist } from '@/hooks/useWishlist'
 import { Skeleton } from '@/components/ui'
 
 interface ProductCardProps {
@@ -11,12 +12,23 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product }: ProductCardProps) => {
   const addItem = useCartStore((s) => s.addItem)
+  const { mutate: toggleWishlist } = useToggleWishlist()
   const isDigital = !!product.sourceFileUrl
   const outOfStock = !isDigital && product.stock === 0
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-100 bg-white
       shadow-sm transition-shadow duration-200 hover:shadow-md">
+
+      {/* Wishlist button */}
+      <button
+        onClick={(e) => { e.preventDefault(); toggleWishlist(product._id) }}
+        className="absolute right-2 top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full
+          bg-white/80 text-gray-400 opacity-0 shadow-sm backdrop-blur-sm transition-all
+          group-hover:opacity-100 hover:text-red-500"
+      >
+        <Heart className="h-4 w-4" />
+      </button>
 
       {/* Image */}
       <Link to={`/products/${product._id}`} className="block overflow-hidden bg-gray-50">

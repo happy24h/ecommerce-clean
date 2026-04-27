@@ -32,6 +32,7 @@ export interface Category {
   image: string
   type: 'POST' | 'PRODUCT'
   websiteId: string
+  totalPosts?: number
 }
 
 // ==================== USER ====================
@@ -150,6 +151,21 @@ export interface PaginatedResponse<T> {
     limit: number
     totalPages: number
   }
+}
+
+// ==================== POST ====================
+export interface Post {
+  _id: string
+  title: string
+  description?: string
+  image: string
+  websiteId: string
+  categoryId: { _id: string; name: string; image?: string } | string
+  likes: string[]
+  commentCount: number
+  createdBy: { _id: string; email: string; name: string; avatar?: string }
+  createdAt: string
+  updatedAt: string
 }
 
 // ==================== FILTER ====================
