@@ -86,6 +86,19 @@ export const useLogout = () => {
   })
 }
 
+// ✅ Đổi mật khẩu
+export const useChangePassword = () => {
+  return useMutation({
+    mutationFn: authApi.changePassword,
+    onSuccess: () => {
+      toast.success('Đổi mật khẩu thành công!')
+    },
+    onError: () => {
+      toast.error('Mật khẩu hiện tại không đúng.')
+    },
+  })
+}
+
 // ✅ Cập nhật profile
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient()

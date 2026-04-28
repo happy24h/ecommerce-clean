@@ -1,6 +1,7 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { queryClient } from '@/lib/queryClient'
 
 import { MainLayout } from '@/components/layout/MainLayout'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
@@ -18,26 +19,9 @@ import { ContactPage }         from '@/pages/ContactPage'
 import { WishlistPage }        from '@/pages/WishlistPage'
 import { PaymentSuccessPage }  from '@/pages/PaymentSuccessPage'
 import { PaymentCancelPage }   from '@/pages/PaymentCancelPage'
+import { OrderDetailPage }     from '@/pages/OrderDetailPage'
+import { ProfilePage }         from '@/pages/ProfilePage'
 
-// ✅ QueryClient config — tối ưu cho E-commerce
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      // Không tự refetch khi focus lại cửa sổ (tránh spam API)
-      refetchOnWindowFocus: false,
-      // Retry 1 lần khi fail (trừ 401/404)
-      retry: (failureCount, error: unknown) => {
-        const status = (error as { response?: { status: number } })?.response?.status
-        if (status === 401 || status === 404 || status === 403) return false
-        return failureCount < 1
-      },
-      staleTime: 1000 * 60, // 1 phút mặc định
-    },
-    mutations: {
-      retry: false,
-    },
-  },
-})
 
 function App() {
   return (
@@ -62,8 +46,8 @@ function App() {
               <Route path="/checkout"           element={<CheckoutPage />} />
               <Route path="/account/wishlist"   element={<WishlistPage />} />
               <Route path="/account/orders"     element={<OrdersPage />} />
-              <Route path="/account/orders/:id" element={<div className="p-8 text-center text-gray-500">Order Detail Page</div>} />
-              <Route path="/account/profile"    element={<div className="p-8 text-center text-gray-500">Profile Page</div>} />
+              <Route path="/account/orders/:id" element={<OrderDetailPage />} />
+              <Route path="/account/profile"    element={<ProfilePage />} />
             </Route>
 
             {/* Payment result pages (PayOS return/cancel URLs) */}

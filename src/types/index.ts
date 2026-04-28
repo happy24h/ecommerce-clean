@@ -36,26 +36,23 @@ export interface Category {
 }
 
 // ==================== USER ====================
-export interface User {
-  id: number
+export interface Permission {
+  _id: string
   name: string
-  email: string
-  phone?: string
-  avatar?: string
-  addresses: Address[]
-  createdAt: string
+  apiPath: string
+  method: string
+  module: string
 }
 
-export interface Address {
+export interface User {
   _id: string
-  label: string
-  fullName: string
-  phone: string
-  province: string
-  district: string
-  ward: string
-  street: string
-  isDefault: boolean
+  name: string
+  email: string
+  avatar?: string
+  address?: string
+  gender?: 'MALE' | 'FEMALE' | 'OTHER'
+  role?: { _id: string; name: string }
+  permissions?: Permission[]
 }
 
 // ==================== AUTH ====================
@@ -141,7 +138,7 @@ export interface PaymentLink {
 export interface Review {
   id: number
   productId: number
-  user: Pick<User, 'id' | 'name' | 'avatar'>
+  user: Pick<User, '_id' | 'name' | 'avatar'>
   rating: number
   comment: string
   images?: string[]

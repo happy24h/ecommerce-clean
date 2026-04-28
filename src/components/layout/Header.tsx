@@ -117,10 +117,19 @@ export const Header = () => {
                   className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm
                     font-medium text-gray-700 hover:bg-gray-100"
                 >
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">
-                    {user?.name?.[0]?.toUpperCase()}
+                  <div className="h-7 w-7 flex-shrink-0 overflow-hidden rounded-full bg-primary-100">
+                    {user?.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center text-xs font-bold text-primary-700">
+                        {user?.name?.[0]?.toUpperCase()}
+                      </span>
+                    )}
                   </div>
-                  <span className="hidden sm:block">{user?.name?.split(' ').pop()}</span>
                   <ChevronDown className="h-3 w-3 text-gray-400" />
                 </button>
 

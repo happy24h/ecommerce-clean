@@ -32,14 +32,14 @@ export const authApi = {
     localStorage.removeItem('access_token')
   },
 
-  // đúng endpoint là /auth/account
   getMe: async (): Promise<User> => {
     const { data } = await axiosInstance.get('/auth/account')
-    return data.data
+    // /auth/account trả về { data: { user: {...} } } — khác với login trả về { data: { user, access_token } }
+    return data.data.user
   },
 
   updateProfile: async (
-    payload: Partial<Pick<User, 'name' | 'phone' | 'avatar'>>
+    payload: Partial<Pick<User, 'name' | 'avatar' | 'address' | 'gender'>>
   ): Promise<ApiResponse<User>> => {
     const { data } = await axiosInstance.put('/users/update-user-info', payload)
     return data

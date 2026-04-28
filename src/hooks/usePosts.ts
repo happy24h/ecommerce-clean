@@ -14,4 +14,5 @@ export const usePost = (id: string) =>
     queryKey: [QUERY_KEYS.POST_DETAIL, id],
     queryFn: () => postsApi.getPostById(id),
     enabled: !!id,
+    staleTime: 1000 * 60 * 5,
   })

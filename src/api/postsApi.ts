@@ -1,11 +1,12 @@
 import { axiosInstance } from './axiosInstance'
+import { WEBSITE_ID } from '@/constants'
 import type { Post, PaginatedResponse } from '@/types'
 
 export const postsApi = {
   getPosts: async (page = 1, pageSize = 9, categoryId?: string): Promise<PaginatedResponse<Post>> => {
     const params: Record<string, unknown> = { current: page, pageSize }
     if (categoryId) params.categoryId = categoryId
-    else params.websiteId = 'my-blog'
+    else params.websiteId = WEBSITE_ID
     const { data } = await axiosInstance.get('/posts', { params })
     return {
       data: data.data?.result ?? [],

@@ -10,7 +10,7 @@ export const categoryApi = {
 
   getPostCategories: async (): Promise<Category[]> => {
     const { data } = await axiosInstance.get('/category', {
-      params: { websiteId: 'my-blog', type: 'POST', pageSize: 20 },
+      params: { websiteId: WEBSITE_ID, type: 'POST', pageSize: 20 },
     })
     return data.data?.result ?? []
   },
