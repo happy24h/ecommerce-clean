@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight, Mail, Phone, MapPin, Clock, Send } from 'lucide-react'
+import { useMutation } from '@tanstack/react-query'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
+import { contactApi } from '@/api/contactApi'
 import toast from 'react-hot-toast'
 
 const CONTACT_INFO = [
@@ -31,7 +33,19 @@ const CONTACT_INFO = [
 export const ContactPage = () => {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [errors, setErrors] = useState<Partial<typeof form>>({})
-  const [loading, setLoading] = useState(false)
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: contactApi.sendContact,
+    onSuccess: () => {
+      toast.success('Gửi thành công! Chúng tôi sẽ phản hồi sớm nhất.')
+      setForm({ name: '', email: '', phone: '', message: '' })
+      setErrors({})
+    },
+    onError: (err: { response?: { data?: { message?: string } } }) => {
+      const msg = err?.response?.data?.message ?? 'Gửi thất bại, vui lòng thử lại.'
+      toast.error(msg)
+    },
+  })
 
   const validate = () => {
     const e: Partial<typeof form> = {}
@@ -39,19 +53,15 @@ export const ContactPage = () => {
     if (!form.email.trim()) e.email = 'Vui lòng nhập email'
     else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Email không hợp lệ'
     if (!form.message.trim()) e.message = 'Vui lòng nhập nội dung'
+    else if (form.message.trim().length < 10) e.message = 'Nội dung phải có ít nhất 10 ký tự'
     setErrors(e)
     return Object.keys(e).length === 0
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!validate()) return
-    setLoading(true)
-    await new Promise((r) => setTimeout(r, 800))
-    setLoading(false)
-    toast.success('Gửi tin nhắn thành công! Chúng tôi sẽ phản hồi sớm nhất.')
-    setForm({ name: '', email: '', phone: '', message: '' })
-    setErrors({})
+    mutate({ name: form.name, email: form.email, phone: form.phone || undefined, message: form.message })
   }
 
   return (
@@ -156,7 +166,7 @@ export const ContactPage = () => {
                 )}
               </div>
 
-              <Button type="submit" size="lg" loading={loading} className="flex items-center gap-2">
+              <Button type="submit" size="lg" loading={isPending} className="flex items-center gap-2">
                 <Send className="h-4 w-4" />
                 Gửi tin nhắn
               </Button>
