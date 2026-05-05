@@ -14,7 +14,12 @@ const STATUS_BADGE: Record<OrderStatus, 'warning' | 'success' | 'info' | 'danger
   CANCELLED: 'danger',
 }
 
-const STATUS_STEPS: OrderStatus[] = ['PENDING', 'PAID', 'SHIPPING', 'DELIVERED']
+const STATUS_STEPS_DEFAULT: OrderStatus[] = ['PENDING', 'PAID', 'SHIPPING', 'DELIVERED']
+const STATUS_STEPS_COD: OrderStatus[]     = ['PENDING', 'SHIPPING', 'DELIVERED']
+
+const COD_STATUS_LABEL: Partial<Record<OrderStatus, string>> = {
+  PENDING: 'Chờ xử lý',
+}
 
 export const OrderDetailPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -39,8 +44,12 @@ export const OrderDetailPage = () => {
     )
   }
 
-  const stepIndex = STATUS_STEPS.indexOf(order.status)
+  const isCOD = order.paymentMethod === 'COD'
+  const statusSteps = isCOD ? STATUS_STEPS_COD : STATUS_STEPS_DEFAULT
+  const stepIndex = statusSteps.indexOf(order.status)
   const isCancelled = order.status === 'CANCELLED'
+  const getStatusLabel = (step: OrderStatus) =>
+    (isCOD && COD_STATUS_LABEL[step]) ? COD_STATUS_LABEL[step]! : ORDER_STATUS_LABEL[step]
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
@@ -60,7 +69,7 @@ export const OrderDetailPage = () => {
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-800">Chi tiết đơn hàng</h1>
         <Badge variant={STATUS_BADGE[order.status]}>
-          {ORDER_STATUS_LABEL[order.status]}
+          {getStatusLabel(order.status)}
         </Badge>
       </div>
 
@@ -68,7 +77,7 @@ export const OrderDetailPage = () => {
       {!isCancelled && (
         <div className="mb-6 rounded-xl border border-gray-100 bg-white p-5">
           <div className="flex items-center justify-between">
-            {STATUS_STEPS.map((step, idx) => (
+            {statusSteps.map((step, idx) => (
               <div key={step} className="flex flex-1 items-center">
                 <div className="flex flex-col items-center gap-1">
                   <div
@@ -81,10 +90,10 @@ export const OrderDetailPage = () => {
                     {idx + 1}
                   </div>
                   <span className={`text-xs ${idx <= stepIndex ? 'text-primary-600 font-medium' : 'text-gray-400'}`}>
-                    {ORDER_STATUS_LABEL[step]}
+                    {getStatusLabel(step)}
                   </span>
                 </div>
-                {idx < STATUS_STEPS.length - 1 && (
+                {idx < statusSteps.length - 1 && (
                   <div
                     className={`mx-1 mb-4 flex-1 border-t-2 transition-colors ${
                       idx < stepIndex ? 'border-primary-600' : 'border-gray-200'
