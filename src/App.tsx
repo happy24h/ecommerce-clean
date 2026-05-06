@@ -21,6 +21,7 @@ import { PaymentSuccessPage }  from '@/pages/PaymentSuccessPage'
 import { PaymentCancelPage }   from '@/pages/PaymentCancelPage'
 import { OrderDetailPage }     from '@/pages/OrderDetailPage'
 import { ProfilePage }         from '@/pages/ProfilePage'
+import { PostDetailPage }      from '@/pages/PostDetailPage'
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
             <Route path="/products"           element={<ProductsPage />} />
             <Route path="/products/:id"        element={<ProductDetailPage />} />
             <Route path="/news"               element={<NewsPage />} />
+            <Route path="/news/:id"           element={<PostDetailPage />} />
             <Route path="/contact"            element={<ContactPage />} />
             <Route path="/category/:slug"     element={<ProductsPage />} />
             <Route path="/search"             element={<ProductsPage />} />

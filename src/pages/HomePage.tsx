@@ -88,7 +88,7 @@ export const HomePage = () => {
             : categories && categories.length > 0 && categories.map((cat) => (
                 <Link
                   key={cat._id}
-                  to={`/category/${cat.slug}`}
+                  to={`/products?categoryId=${cat._id}`}
                   className="group flex flex-col items-center gap-2"
                 >
                   <div className="flex h-14 w-14 items-center justify-center rounded-full

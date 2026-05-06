@@ -21,6 +21,7 @@ export const Header = () => {
   const { mutate: logout } = useLogout()
 
   const navLinks = [
+    { to: ROUTES.HOME, label: 'Trang chủ' },
     { to: ROUTES.PRODUCTS, label: 'Sản phẩm' },
     { to: '/news', label: 'Tin tức' },
     { to: '/contact', label: 'Liên hệ' },
