@@ -23,6 +23,11 @@ export const authApi = {
       name: payload.name,
       email: payload.email,
       password: payload.password,
+      age: payload.age,
+      gender: payload.gender,
+      address: payload.address,
+      avatar: 'https://res-console.cloudinary.com/dvdfr9qvv/thumbnails/v1/image/upload/v1770363235/ZGVmYXVsdF9xaHNncDg=/preview',
+      status: true,
     })
     return data.data
   },

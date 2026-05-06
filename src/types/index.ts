@@ -66,6 +66,9 @@ export interface RegisterPayload {
   email: string
   password: string
   confirmPassword: string
+  age: number
+  gender: 'male' | 'female' | 'other'
+  address: string
 }
 
 export interface AuthResponse {
