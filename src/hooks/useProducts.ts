@@ -56,12 +56,13 @@ export const useFeaturedProducts = () => {
   })
 }
 
-export const useRelatedProducts = (categoryId: string, excludeId: string) => {
+export const useRelatedProducts = (categoryId: { _id: string } | string, excludeId: string) => {
+  const cid = typeof categoryId === 'object' ? categoryId._id : categoryId
   return useQuery({
     // excludeId nằm trong queryKey để mỗi product detail có cache riêng
-    queryKey: [QUERY_KEYS.RELATED_PRODUCTS, categoryId, excludeId],
-    queryFn: () => productApi.getProducts({ categoryId, page: 1, limit: 5 }),
-    enabled: !!categoryId,
+    queryKey: [QUERY_KEYS.RELATED_PRODUCTS, cid, excludeId],
+    queryFn: () => productApi.getProducts({ categoryId: cid, page: 1, limit: 5 }),
+    enabled: !!cid,
     staleTime: 1000 * 60 * 5,
     // Lọc + giới hạn ngay trong query, không cần thêm state ở component
     select: (data) => data.data.filter((p) => p._id !== excludeId).slice(0, 4),

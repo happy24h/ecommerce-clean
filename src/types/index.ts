@@ -17,7 +17,7 @@ export interface Product {
   metadata?: Record<string, unknown>
   // Common
   websiteId: string
-  categoryId: string
+  categoryId: { _id: string; name: string } | string
   isActive: boolean
   createdBy?: { _id: string; email: string; name: string; avatar?: string }
   createdAt: string

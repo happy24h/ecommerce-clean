@@ -13,10 +13,32 @@ export const productApi = {
   getProducts: async (
     filter: ProductFilter = {}
   ): Promise<PaginatedResponse<Product>> => {
-    // backend dùng current/pageSize thay vì page/limit
-    const { page, limit, ...rest } = filter
-    const params = { websiteId: WEBSITE_ID, ...rest, current: page, pageSize: limit }
-    const { data } = await axiosInstance.get('/product', { params })
+    const { page, limit, minPrice, maxPrice, categoryId, search, sort } = filter
+
+    const catId = typeof categoryId === 'object' ? (categoryId as { _id: string })._id : categoryId
+
+    // Map frontend sort value → field name thực tế trong schema
+    const SORT_MAP: Record<string, string> = {
+      price_asc:  'price',
+      price_desc: '-price',
+      newest:     '-createdAt',
+      popular:    '-createdAt',
+      rating:     '-createdAt',
+    }
+
+    // aqp (api-query-parser) đọc trực tiếp từ query params
+    // price=>=100000 & price=<=500000 → { price: { $gte: 100000, $lte: 500000 } }
+    const baseParams = new URLSearchParams()
+    baseParams.set('websiteId', WEBSITE_ID)
+    baseParams.set('current',   String(page ?? 1))
+    baseParams.set('pageSize',  String(limit ?? 12))
+    if (catId)  baseParams.set('categoryId', catId)
+    if (search) baseParams.set('title', search)
+    if (sort && SORT_MAP[sort]) baseParams.set('sort', SORT_MAP[sort])
+    if (minPrice !== undefined) baseParams.append('price', `>=${minPrice}`)
+    if (maxPrice !== undefined) baseParams.append('price', `<=${maxPrice}`)
+
+    const { data } = await axiosInstance.get(`/product?${baseParams.toString()}`)
     return {
       data: data.data?.result ?? [],
       meta: {
