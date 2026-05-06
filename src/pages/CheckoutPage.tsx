@@ -11,30 +11,34 @@ const PAYMENT_OPTIONS: {
   label: string
   desc: string
   icon: React.ReactNode
+  disabled?: boolean
 }[] = [
-  {
-    method: 'PAYOS',
-    label: 'PayOS',
-    desc: 'Thanh toán QR Code — nhanh & an toàn',
-    icon: <QrCode className="h-5 w-5 text-blue-500" />,
-  },
-  {
-    method: 'MOMO',
-    label: 'Ví MoMo',
-    desc: 'Thanh toán qua ví MoMo',
-    icon: <Wallet className="h-5 w-5 text-pink-500" />,
-  },
-  {
-    method: 'BANK_TRANSFER',
-    label: 'Chuyển khoản ngân hàng',
-    desc: 'Chuyển khoản trực tiếp qua Internet Banking',
-    icon: <Building2 className="h-5 w-5 text-green-600" />,
-  },
   {
     method: 'COD',
     label: 'Thanh toán khi nhận hàng',
     desc: 'Trả tiền mặt khi nhận được hàng',
     icon: <Truck className="h-5 w-5 text-orange-500" />,
+  },
+  {
+    method: 'PAYOS',
+    label: 'PayOS',
+    desc: 'Sắp ra mắt',
+    icon: <QrCode className="h-5 w-5 text-gray-300" />,
+    disabled: true,
+  },
+  {
+    method: 'MOMO',
+    label: 'Ví MoMo',
+    desc: 'Sắp ra mắt',
+    icon: <Wallet className="h-5 w-5 text-gray-300" />,
+    disabled: true,
+  },
+  {
+    method: 'BANK_TRANSFER',
+    label: 'Chuyển khoản ngân hàng',
+    desc: 'Sắp ra mắt',
+    icon: <Building2 className="h-5 w-5 text-gray-300" />,
+    disabled: true,
   },
 ]
 
@@ -47,7 +51,7 @@ export const CheckoutPage = () => {
     phone: '',
     address: '',
   })
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('PAYOS')
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('COD')
   const [note, setNote] = useState('')
 
   const subtotal = totalPrice()
@@ -129,13 +133,15 @@ export const CheckoutPage = () => {
           <section className="rounded-xl border border-gray-100 bg-white p-5">
             <h2 className="mb-3 text-base font-semibold text-gray-800">Phương thức thanh toán</h2>
             <div className="space-y-2">
-              {PAYMENT_OPTIONS.map(({ method, label, desc, icon }) => (
+              {PAYMENT_OPTIONS.map(({ method, label, desc, icon, disabled }) => (
                 <label
                   key={method}
-                  className={`flex cursor-pointer items-center gap-3 rounded-lg border-2 p-3 transition-colors ${
-                    paymentMethod === method
-                      ? 'border-primary-500 bg-primary-50'
-                      : 'border-gray-100 hover:border-gray-200'
+                  className={`flex items-center gap-3 rounded-lg border-2 p-3 transition-colors ${
+                    disabled
+                      ? 'cursor-not-allowed border-gray-100 bg-gray-50 opacity-50'
+                      : paymentMethod === method
+                        ? 'cursor-pointer border-primary-500 bg-primary-50'
+                        : 'cursor-pointer border-gray-100 hover:border-gray-200'
                   }`}
                 >
                   <input
@@ -143,6 +149,7 @@ export const CheckoutPage = () => {
                     name="payment"
                     value={method}
                     checked={paymentMethod === method}
+                    disabled={disabled}
                     onChange={() => setPaymentMethod(method)}
                     className="accent-primary-600"
                   />
@@ -151,10 +158,17 @@ export const CheckoutPage = () => {
                       {icon}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-800">{label}</p>
+                      <p className={`text-sm font-medium ${disabled ? 'text-gray-400' : 'text-gray-800'}`}>
+                        {label}
+                      </p>
                       <p className="text-xs text-gray-400">{desc}</p>
                     </div>
                   </div>
+                  {disabled && (
+                    <span className="flex-shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-400">
+                      Sắp ra mắt
+                    </span>
+                  )}
                 </label>
               ))}
             </div>
@@ -225,7 +239,7 @@ export const CheckoutPage = () => {
             onClick={handleSubmit}
             rightIcon={<ChevronRight className="h-4 w-4" />}
           >
-            {paymentMethod === 'PAYOS' ? 'Thanh toán ngay' : 'Xác nhận đặt hàng'}
+            Xác nhận đặt hàng
           </Button>
 
           {!isAddressValid && (
