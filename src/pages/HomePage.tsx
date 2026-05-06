@@ -94,7 +94,7 @@ export const HomePage = () => {
                   <div className="flex h-14 w-14 items-center justify-center rounded-full
                     bg-gray-50 border-2 border-transparent group-hover:border-primary-400
                     transition-colors overflow-hidden">
-                    <img src={cat.image} alt={cat.name} className="h-10 w-10 object-contain" />
+                    <img src={cat.image} alt={cat.name} className="h-full w-full object-cover" />
                   </div>
                   <span className="text-center text-xs font-medium text-gray-600 group-hover:text-primary-600">
                     {cat.name}

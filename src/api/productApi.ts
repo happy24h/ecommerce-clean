@@ -47,7 +47,7 @@ export const productApi = {
   ): Promise<Product[]> => {
     const { data } = await axiosInstance.get(
       `/products/${productId}/related`,
-      { params: { limit } }
+      { params: { limit, websiteId: WEBSITE_ID } }
     )
     return data.data
   },
